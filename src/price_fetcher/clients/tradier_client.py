@@ -2,7 +2,7 @@ import json
 import http.client
 import pandas as pd
 from datetime import datetime
-from .helpers import log_client_fetch_error, record_keys, columns_map
+from .helpers import log_client_fetch_error, asset_record_keys, asset_columns_map
 
 
 class TradierClient:
@@ -39,8 +39,8 @@ class TradierClient:
                 day['date'] = datetime.strptime(day['date'], "%Y-%m-%d")
 
             result = pd.DataFrame(
-                days, columns=record_keys)
-            result.rename(columns=columns_map, inplace=True)
+                days, columns=asset_record_keys)
+            result.rename(columns=asset_columns_map, inplace=True)
             result['Date'] = pd.to_datetime(result['Date'], format='%Y-%m-%d')
             result.set_index('Date', inplace=True)
 

@@ -3,7 +3,7 @@ from datetime import date
 from dateutil.parser import parse
 from lxml import html
 import requests
-from .helpers import log_client_fetch_error, column_names
+from .helpers import log_client_fetch_error, asset_column_names
 
 
 class FtClient:
@@ -39,7 +39,7 @@ class FtClient:
                     'Volume': self._parseFloatCell(html_cells[5].getchildren()[0])
                 })
             result = pd.DataFrame(
-                history, columns=column_names)
+                history, columns=asset_column_names)
             result.set_index('Date', inplace=True)
             return result
 

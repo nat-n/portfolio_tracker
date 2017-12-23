@@ -12,9 +12,9 @@ def log_client_fetch_error(client, symbol, start, end):
     print(msg)
 
 
-record_keys = ['date', 'open', 'high', 'low', 'close', 'volume']
-column_names = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
-columns_map = {
+asset_record_keys = ['date', 'open', 'high', 'low', 'close', 'volume']
+asset_column_names = ['Date', 'Open', 'High', 'Low', 'Close', 'Volume']
+asset_columns_map = {
     'date': 'Date',
     'open': 'Open',
     'high': 'High',
