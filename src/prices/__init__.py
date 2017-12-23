@@ -4,7 +4,7 @@ import pandas as pd
 from config import config
 
 
-class PriceFetcher:
+class Prices:
     def parse_date(self, d):
         if isinstance(d, datetime):
             return d
