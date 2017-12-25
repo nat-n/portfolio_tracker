@@ -14,7 +14,9 @@ class FtClient:
         '&symbol={symbol}'
     )
 
-    def fetch_history(self, symbol, start_date, end_date=date.today().isoformat(), query_url=query_url):
+    def fetch_history(
+            self, symbol, start_date,
+            end_date=date.today().isoformat(), query_url=query_url):
         try:
             url = (query_url).format(
                 symbol=symbol,
@@ -36,7 +38,8 @@ class FtClient:
                     'High': self._parseFloatCell(html_cells[2]),
                     'Low': self._parseFloatCell(html_cells[3]),
                     'Close': self._parseFloatCell(html_cells[4]),
-                    'Volume': self._parseFloatCell(html_cells[5].getchildren()[0])
+                    'Volume': self._parseFloatCell(
+                        html_cells[5].getchildren()[0])
                 })
             result = pd.DataFrame(
                 history, columns=asset_column_names)

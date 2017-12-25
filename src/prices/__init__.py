@@ -40,7 +40,8 @@ class Prices:
             self.strip_empty_rows(from_cache.loc[missing_end:])
         ])
 
-    def fetch_currency_rates(self, base_currency, other_currency, start_date, end_date):
+    def fetch_currency_rates(
+            self, base_currency, other_currency, start_date, end_date):
         start_date = self.parse_date(start_date)
         end_date = self.parse_date(end_date)
         num_days = (end_date - start_date).days + 1
@@ -60,8 +61,9 @@ class Prices:
         results = pd.concat([
             from_cache,
             ClientProxy.get_currency_price_history(
-                base_currency, other_currency, start_date, end_date, skip_dates).dropna()
+                base_currency, other_currency, start_date, end_date, skip_dates
+            ).dropna()
         ])
         results = results[~results.index.duplicated(keep='first')].sort_index()
-        
+
         return results

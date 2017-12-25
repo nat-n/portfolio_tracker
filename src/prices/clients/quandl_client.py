@@ -14,7 +14,8 @@ class QuandlCleint:
             quandl.ApiConfig.api_key = api_key
         quandl.ApiConfig.api_version = api_version
 
-    def fetch_history(self, symbol, start_date, end_date=date.today().isoformat()):
+    def fetch_history(
+            self, symbol, start_date, end_date=date.today().isoformat()):
         qsymbol = "WIKI/" + symbol
         try:
             return self._normalize_results(

@@ -37,10 +37,17 @@ class ClientProxy:
                 return result
 
     @classmethod
-    def get_currency_price_history(self, base_currency, other_currency, start_date, end_date, skip_dates=None):
+    def get_currency_price_history(
+            self, base_currency, other_currency, start_date, end_date,
+            skip_dates=None):
         for client_name, client in self.currency_clients.items():
             result = client.fetch_history(
-                base_currency, other_currency, start_date, end_date, skip_dates)
+                base_currency,
+                other_currency,
+                start_date,
+                end_date,
+                skip_dates)
             if result is not None:
-                self.cache_client.put_currency_rates(client_name, base_currency, result)
+                self.cache_client.put_currency_rates(
+                    client_name, base_currency, result)
                 return result[[other_currency]]

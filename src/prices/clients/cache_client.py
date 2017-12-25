@@ -2,7 +2,8 @@ import math
 from datetime import datetime, date, timedelta
 import pandas as pd
 from pymongo import UpdateOne
-from .helpers import log_client_fetch_error, asset_record_keys, asset_columns_map
+from .helpers import log_client_fetch_error, asset_record_keys, \
+    asset_columns_map
 
 
 class CacheClient:
@@ -12,7 +13,8 @@ class CacheClient:
         self.asset_prices = db.asset_prices
         self.currency_rates = db.currency_rates
 
-    def put_asset_prices(self, source, symbol, price_data, start_date, end_date):
+    def put_asset_prices(
+            self, source, symbol, price_data, start_date, end_date):
         records = self.asset_prices_to_cache_records(
             source, symbol, price_data, start_date, end_date)
         self.upsert_records(self.asset_prices, records)
@@ -34,10 +36,12 @@ class CacheClient:
             return self.create_asset_prices_data_frame([])
 
     def put_currency_rates(self, source, base_currency, rate_data):
-        records = self.currency_rates_to_cache_records(source, base_currency, rate_data)
+        records = self.currency_rates_to_cache_records(
+            source, base_currency, rate_data)
         self.upsert_records(self.currency_rates, records)
 
-    def get_currency_rates(self, base_currency, other_currency, start_date, end_date):
+    def get_currency_rates(
+            self, base_currency, other_currency, start_date, end_date):
         symbols = sorted([base_currency, other_currency])
         query = {'symbols': symbols}
         try:
@@ -49,7 +53,7 @@ class CacheClient:
                     query['date']['$lte'] = end_date
             return self.create_currency_rates_data_frame(
                 other_currency,
-                self.currency_rates.find(query, {'_id': 0})#.sort({ date: 1})
+                self.currency_rates.find(query, {'_id': 0})
             )
         except Exception:
             log_client_fetch_error('cache', symbols, start_date, end_date)
@@ -67,7 +71,7 @@ class CacheClient:
                 query['symbols'] = record['symbols']
             # avoid overwritting a day that isn't missing with one that is
             if record['_placeholer']:
-                query['_placeholer']: True
+                query['_placeholer'] = True
             operations.append(UpdateOne(query, {'$set': record}, upsert=True))
         collection.bulk_write(operations, ordered=False)
 
@@ -77,7 +81,8 @@ class CacheClient:
         return [float(float_parse_template % n) for n in [rate, 1 / rate]]
 
     @classmethod
-    def currency_rates_to_cache_records(self, source, base_currency, rate_data):
+    def currency_rates_to_cache_records(
+            self, source, base_currency, rate_data):
         records = []
         for other_currency, rates in rate_data.iteritems():
             if base_currency < other_currency:
@@ -111,15 +116,16 @@ class CacheClient:
     @staticmethod
     def create_currency_rates_data_frame(symbol, records):
         rows = [{
-            'Date': record['date'],
-            symbol: record['rate'] if record['symbols'][1] == symbol else record['inverse']
-        } for record in records]
+            'Date': r['date'],
+            symbol: r['rate'] if r['symbols'][1] == symbol else r['inverse']
+        } for r in records]
         result = pd.DataFrame(rows, columns=['Date', symbol])
         result.set_index('Date', inplace=True)
         return result
 
     @staticmethod
-    def asset_prices_to_cache_records(source, symbol, price_data, start_date, end_date):
+    def asset_prices_to_cache_records(
+            source, symbol, price_data, start_date, end_date):
         today = datetime(date.today().year,
                          date.today().month,
                          date.today().day)

@@ -2,7 +2,8 @@ import json
 import http.client
 import pandas as pd
 from datetime import datetime
-from .helpers import log_client_fetch_error, asset_record_keys, asset_columns_map
+from .helpers import log_client_fetch_error, asset_record_keys, \
+    asset_columns_map
 
 
 class TradierClient:

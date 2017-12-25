@@ -4,11 +4,13 @@ import time
 import pandas as pd
 from datetime import datetime, date
 
+
 class FixerClient:
     query_url = (
         'http://api.fixer.io/{date}'
         '?base={base}'
-        # '&symbols={symbols}' # actually just grab and cache everything cos why not
+        # actually just grab and cache everything cos why not
+        # '&symbols={symbols}'
     )
 
     earliest_date = datetime(1999, 1, 4)
@@ -21,7 +23,9 @@ class FixerClient:
             symbols=','.join(currencies)
         )
 
-    def fetch_history(self, base_currency, currencies, start_date, end_date, skip_dates=None, remaining_retries=10):
+    def fetch_history(
+            self, base_currency, currencies, start_date, end_date,
+            skip_dates=None, remaining_retries=10):
         if isinstance(currencies, str):
             currencies = [currencies]
         dates = pd.date_range(start_date, end_date)
@@ -31,11 +35,14 @@ class FixerClient:
             dates = dates.difference(skip_dates)
 
         for target_date in dates:
-            # gradually increase remaining retry budget with successful requests
-            remaining_retries = min(self.max_retry_budget, remaining_retries + 0.075)
+            # gradually increase remaining retry budget with successful
+            # requests
+            remaining_retries = min(
+                self.max_retry_budget, remaining_retries + 0.075)
             # throttle harder if fewer retries remaining
             time.sleep(
-                max(0.15, 0.6 * (1 - (remaining_retries / self.max_retry_budget))))
+                max(0.15,
+                    0.6 * (1 - (remaining_retries / self.max_retry_budget))))
             req = requests.get(self.request_url(
                 target_date, base_currency, currencies))
             try:
@@ -43,11 +50,14 @@ class FixerClient:
             except JSONDecodeError as req_error:
                 if remaining_retries > 0:
                     # wait longer if fewer retries remaining
-                    time.sleep(max(2, self.max_retry_budget - remaining_retries))
-                    return self.fetch_history(base_currency, currencies, target_date, end_date, skip_dates, remaining_retries - 1)
+                    time.sleep(
+                        max(2, self.max_retry_budget - remaining_retries))
+                    return self.fetch_history(
+                        base_currency, currencies, target_date, end_date,
+                        skip_dates, remaining_retries - 1)
                 else:
                     raise req_error
-            
+
             for currency in res['rates']:
                 result.at[target_date, currency] = res['rates'][currency]
 
